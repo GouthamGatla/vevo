@@ -1,3 +1,11 @@
 export const AppRoutes = {
-    dashboardScreen: 'DashboardScreen',
-}
+  posts: 'PostsListScreen',
+  postDetail: 'PostDetailScreen',
+  userDetail: 'UserDetailScreen',
+} as const;
+
+export type RootStackParamList = {
+  PostsListScreen: undefined;
+  PostDetailScreen: { postId: number };
+  UserDetailScreen: { userId: number };
+};
