@@ -16,6 +16,7 @@ import { useNavigation } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
 import { RootStackParamList } from '../../navigation/AppRoutes';
 import { useDebounce } from 'use-debounce';
+import SearchIcon from '../../../assets/icons/search.svg';
 
 type PostsListScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PostsListScreen'>;
 
@@ -131,7 +132,6 @@ export const PostsListScreen: React.FC = () => {
             activeOpacity={0.7}
           >
             <Text style={styles.viewPostText}>View Post</Text>
-            <Text style={styles.viewPostArrow}>→</Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -165,7 +165,8 @@ export const PostsListScreen: React.FC = () => {
 
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          <Text style={styles.searchIcon}>🔍</Text>
+          {/* <Text style={styles.searchIcon}>🔍</Text> */}
+          <SearchIcon width={24} height={24} />
           <TextInput
             style={styles.searchInput}
             placeholder="Search posts..."

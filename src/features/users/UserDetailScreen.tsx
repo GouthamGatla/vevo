@@ -11,6 +11,11 @@ import {
 import { useGetUserByIdQuery } from '../../services/api/usersApi';
 import { useRoute, RouteProp } from '@react-navigation/native';
 import { RootStackParamList } from '../../navigation/AppRoutes';
+import NotificationIcon from '../../../assets/icons/notification.svg';
+import MobileIcon from '../../../assets/icons/mobileIcon.svg';
+import WebIcon from '../../../assets/icons/web.svg';
+import LocationIcon from '../../../assets/icons/location.svg';
+import CommunityIcon from '../../../assets/icons/community.svg';
 
 type UserDetailScreenRouteProp = RouteProp<RootStackParamList, 'UserDetailScreen'>;
 
@@ -94,7 +99,7 @@ export const UserDetailScreen: React.FC = () => {
           <View style={styles.divider} />
           
           <View style={styles.contactItem}>
-            <Text style={styles.contactIcon}>📧</Text>
+            <NotificationIcon width={24} height={24} />
             <View style={styles.contactInfo}>
               <Text style={styles.contactLabel}>Email</Text>
               <Text style={styles.contactValue}>{user.email}</Text>
@@ -102,7 +107,7 @@ export const UserDetailScreen: React.FC = () => {
           </View>
 
           <View style={styles.contactItem}>
-            <Text style={styles.contactIcon}>📱</Text>
+          <MobileIcon width={24} height={24} />
             <View style={styles.contactInfo}>
               <Text style={styles.contactLabel}>Phone</Text>
               <Text style={styles.contactValue}>{user.phone}</Text>
@@ -110,7 +115,7 @@ export const UserDetailScreen: React.FC = () => {
           </View>
 
           <View style={styles.contactItem}>
-            <Text style={styles.contactIcon}>🌐</Text>
+          <WebIcon width={24} height={24} />
             <View style={styles.contactInfo}>
               <Text style={styles.contactLabel}>Website</Text>
               <Text style={styles.contactLink}>{user.website}</Text>
@@ -123,7 +128,7 @@ export const UserDetailScreen: React.FC = () => {
           <View style={styles.divider} />
           
           <View style={styles.locationItem}>
-            <Text style={styles.locationIcon}>📍</Text>
+          <LocationIcon width={24} height={24} />
             <View style={styles.locationInfo}>
               <Text style={styles.locationAddress}>{fullAddress}</Text>
             </View>
@@ -148,7 +153,7 @@ export const UserDetailScreen: React.FC = () => {
           <View style={styles.companyCard}>
             <View style={styles.companyHeader}>
               <View style={styles.companyIconContainer}>
-                <Text style={styles.companyIcon}>🏢</Text>
+              <CommunityIcon width={24} height={24} />
               </View>
               <View style={styles.companyInfo}>
                 <Text style={styles.companyName}>{user.company.name}</Text>
@@ -279,9 +284,9 @@ const styles = StyleSheet.create({
   },
   contactItem: {
     flexDirection: 'row',
-    alignItems: 'flex-start',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
+    alignItems: 'center',
+    justifyContent: 'center',
+    padding: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#f3f2ef',
   },

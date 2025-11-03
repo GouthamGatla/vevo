@@ -168,7 +168,6 @@ export const PostDetailScreen: React.FC = () => {
 
           <View style={styles.engagementBar}>
             <View style={styles.engagementItem}>
-              <Text style={styles.engagementIcon}>💬</Text>
               <Text style={styles.engagementText}>
                 {comments?.length || 0} {comments?.length === 1 ? 'comment' : 'comments'}
               </Text>
@@ -228,7 +227,6 @@ export const PostDetailScreen: React.FC = () => {
                 </View>
               ) : (
                 <View style={styles.emptyComments}>
-                  <Text style={styles.emptyCommentsIcon}>💬</Text>
                   <Text style={styles.emptyCommentsText}>No comments yet</Text>
                   <Text style={styles.emptyCommentsSubtext}>Start the conversation</Text>
                 </View>
