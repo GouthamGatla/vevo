@@ -7,16 +7,15 @@ import {
   Text, 
   TouchableOpacity,
   Animated,
+  RefreshControl,
 } from 'react-native';
 import { useGetPostByIdQuery } from '../../services/api/postsApi';
 import { useGetCommentsByPostIdQuery } from '../../services/api/commentsApi';
 import { useGetUserByIdQuery } from '../../services/api/usersApi';
 import { useNavigation, useRoute, RouteProp } from '@react-navigation/native';
 import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../navigation/AppRoutes';
 
-type PostDetailScreenRouteProp = RouteProp<RootStackParamList, 'PostDetailScreen'>;
-type PostDetailScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PostDetailScreen'>;
+
 
 const CommentSkeleton: React.FC = () => {
   const animatedValue = React.useRef(new Animated.Value(0)).current;
@@ -36,6 +35,7 @@ const CommentSkeleton: React.FC = () => {
         }),
       ])
     ).start();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const opacity = animatedValue.interpolate({
@@ -59,15 +59,15 @@ const CommentSkeleton: React.FC = () => {
 };
 
 export const PostDetailScreen: React.FC = () => {
-  const route = useRoute<PostDetailScreenRouteProp>();
-  const navigation = useNavigation<PostDetailScreenNavigationProp>();
+  const route = useRoute<any>();
+  const navigation = useNavigation<any>();
   const { postId } = route.params;
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const { data: post, isLoading: isLoadingPost, error: postError } = useGetPostByIdQuery(postId);
-  const { data: comments, isLoading: isLoadingComments } = useGetCommentsByPostIdQuery(postId);
-  const { data: user } = useGetUserByIdQuery(post?.userId || 0, {
+  const { data: post, isLoading: isLoadingPost, error: postError, refetch: refetchPost } = useGetPostByIdQuery(postId);
+  const { data: comments, isLoading: isLoadingComments, refetch: refetchComments } = useGetCommentsByPostIdQuery(postId);
+  const { data: user, refetch: refetchUser } = useGetUserByIdQuery(post?.userId || 0, {
     skip: !post?.userId,
   });
 
@@ -104,6 +104,16 @@ export const PostDetailScreen: React.FC = () => {
     }
   }, [post, navigation]);
 
+  const onRefresh = useCallback(() => {
+    refetchPost();
+    refetchComments();
+    if (post?.userId) {
+      refetchUser();
+    }
+  }, [refetchPost, refetchComments, refetchUser, post?.userId]);
+
+  const isRefreshing = isLoadingPost || isLoadingComments;
+
   if (isLoadingPost) {
     return (
       <View style={styles.centerContainer}>
@@ -138,6 +148,14 @@ export const PostDetailScreen: React.FC = () => {
       style={styles.container} 
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
+      refreshControl={
+        <RefreshControl
+          refreshing={isRefreshing}
+          onRefresh={onRefresh}
+          tintColor="#0077b5"
+          colors={['#0077b5']}
+        />
+      }
     >
       <Animated.View style={{ opacity: fadeAnim }}>
         <View style={styles.postCard}>
@@ -298,7 +316,7 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderBottomWidth: 1,
     borderColor: '#e9ecef',
-    paddingTop: 16,
+    paddingTop: 20,
     paddingBottom: 0,
   },
   authorSection: {
@@ -313,13 +331,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   authorAvatar: {
-    width: 48,
-    height: 48,
-    borderRadius: 24,
+    width: 52,
+    height: 52,
+    borderRadius: 26,
     justifyContent: 'center',
     alignItems: 'center',
-    marginRight: 12,
+    marginRight: 14,
     borderWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.15,
+    shadowRadius: 4,
+    elevation: 3,
   },
   authorAvatarText: {
     color: '#fff',
@@ -356,17 +379,17 @@ const styles = StyleSheet.create({
     paddingBottom: 12,
   },
   postTitle: {
-    fontSize: 20,
-    fontWeight: '400',
-    color: '#000000',
-    lineHeight: 28,
-    marginBottom: 12,
-    letterSpacing: -0.2,
+    fontSize: 22,
+    fontWeight: '600',
+    color: '#1a1a1a',
+    lineHeight: 30,
+    marginBottom: 16,
+    letterSpacing: -0.3,
   },
   postBody: {
-    fontSize: 15,
-    lineHeight: 22,
-    color: '#000000',
+    fontSize: 16,
+    lineHeight: 24,
+    color: '#333',
     fontWeight: '400',
     letterSpacing: -0.1,
   },
@@ -421,9 +444,9 @@ const styles = StyleSheet.create({
   },
   commentCard: {
     paddingHorizontal: 16,
-    paddingVertical: 16,
+    paddingVertical: 18,
     borderBottomWidth: 1,
-    borderBottomColor: '#e9ecef',
+    borderBottomColor: '#f0f0f0',
     backgroundColor: '#ffffff',
   },
   commentCardLast: {
@@ -435,14 +458,19 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   commentAvatar: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
     marginTop: 2,
     borderWidth: 0,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.12,
+    shadowRadius: 2,
+    elevation: 2,
   },
   commentAvatarText: {
     color: '#fff',
@@ -465,31 +493,32 @@ const styles = StyleSheet.create({
     fontWeight: '400',
   },
   commentBody: {
-    fontSize: 14,
-    lineHeight: 20,
-    color: '#000000',
+    fontSize: 15,
+    lineHeight: 22,
+    color: '#333',
     fontWeight: '400',
     letterSpacing: -0.1,
-    marginLeft: 44,
+    marginLeft: 48,
+    marginTop: 4,
   },
   emptyComments: {
-    padding: 48,
+    padding: 60,
     alignItems: 'center',
   },
   emptyCommentsIcon: {
-    fontSize: 40,
-    marginBottom: 12,
+    fontSize: 56,
+    marginBottom: 16,
     opacity: 0.4,
   },
   emptyCommentsText: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
-    color: '#000000',
-    marginBottom: 4,
+    color: '#1a1a1a',
+    marginBottom: 6,
   },
   emptyCommentsSubtext: {
-    fontSize: 14,
-    color: '#666666',
+    fontSize: 15,
+    color: '#666',
     textAlign: 'center',
   },
   commentSkeletonCard: {

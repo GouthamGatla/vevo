@@ -8,6 +8,7 @@ import {
   Text,
   TextInput,
   Platform,
+  RefreshControl,
 } from 'react-native';
 import { useGetPostsQuery } from '../../services/api/postsApi';
 import { useGetUsersQuery } from '../../services/api/usersApi';
@@ -22,8 +23,8 @@ export const PostsListScreen: React.FC = () => {
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   
-  const { data: posts, isLoading: isLoadingPosts, error: postsError } = useGetPostsQuery();
-  const { data: users, isLoading: isLoadingUsers } = useGetUsersQuery();
+  const { data: posts, isLoading: isLoadingPosts, error: postsError, refetch: refetchPosts } = useGetPostsQuery();
+  const { data: users, isLoading: isLoadingUsers, refetch: refetchUsers } = useGetUsersQuery();
 
   const userIdToName = useMemo(() => {
     if (!users) return {};
@@ -137,6 +138,13 @@ export const PostsListScreen: React.FC = () => {
 
   const keyExtractor = useCallback((item: Post) => item.id.toString(), []);
 
+  const onRefresh = useCallback(() => {
+    refetchPosts();
+    refetchUsers();
+  }, [refetchPosts, refetchUsers]);
+
+  const isRefreshing = isLoadingPosts || isLoadingUsers;
+
   if (isLoadingPosts || isLoadingUsers) {
     return (
       <View style={styles.centerContainer}>
@@ -149,7 +157,9 @@ export const PostsListScreen: React.FC = () => {
   if (postsError) {
     return (
       <View style={styles.centerContainer}>
-        <Text style={styles.errorText}>Error loading posts. Please try again.</Text>
+        <Text style={styles.errorIcon}>⚠️</Text>
+        <Text style={styles.errorText}>Error loading posts</Text>
+        <Text style={styles.emptySubtext}>Please pull down to refresh</Text>
       </View>
     );
   }
@@ -193,11 +203,24 @@ export const PostsListScreen: React.FC = () => {
         initialNumToRender={10}
         maxToRenderPerBatch={10}
         windowSize={5}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={onRefresh}
+            tintColor="#0077b5"
+            colors={['#0077b5']}
+          />
+        }
         ListEmptyComponent={
           <View style={styles.emptyContainer}>
             <Text style={styles.emptyText}>
               {searchQuery ? 'No posts found' : 'No posts available'}
             </Text>
+            {searchQuery && (
+              <Text style={styles.emptySubtext}>
+                Try to search for a post by title, username or name
+              </Text>
+            )}
           </View>
         }
       />
@@ -229,6 +252,10 @@ const styles = StyleSheet.create({
     padding: 20,
     fontWeight: '500',
   },
+  errorIcon: {
+    fontSize: 48,
+    marginBottom: 16,
+  },
   header: {
     backgroundColor: '#fff',
     paddingTop: Platform.OS === 'ios' ? 50 : 10,
@@ -253,10 +280,12 @@ const styles = StyleSheet.create({
   searchInputContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-    borderRadius: 10,
-    paddingHorizontal: 12,
-    height: 36,
+    backgroundColor: '#f5f5f5',
+    borderRadius: 12,
+    paddingHorizontal: 14,
+    height: 44,
+    borderWidth: 1,
+    borderColor: '#e8e8e8',
   },
   searchIcon: {
     fontSize: 16,
@@ -264,9 +293,11 @@ const styles = StyleSheet.create({
   },
   searchInput: {
     flex: 1,
-    fontSize: 14,
+    fontSize: 15,
     color: '#262626',
     padding: 0,
+    marginLeft: 10,
+    fontWeight: '400',
   },
   clearButton: {
     padding: 4,
@@ -278,23 +309,30 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   listContent: {
-    paddingVertical: 8,
+    paddingVertical: 12,
+    paddingHorizontal: 4,
   },
   postCard: {
     backgroundColor: '#fff',
-    marginHorizontal: 0,
-    marginVertical: 8,
-    borderBottomWidth: StyleSheet.hairlineWidth,
-    borderBottomColor: '#f0f0f0',
+    marginHorizontal: 12,
+    marginVertical: 6,
+    borderRadius: 12,
     paddingBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.08,
+    shadowRadius: 8,
+    elevation: 3,
+    borderWidth: 1,
+    borderColor: '#f0f0f0',
   },
   postHeader: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
     paddingHorizontal: 16,
-    paddingTop: 12,
-    paddingBottom: 10,
+    paddingTop: 16,
+    paddingBottom: 12,
   },
   userInfo: {
     flexDirection: 'row',
@@ -302,12 +340,17 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 12,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.15,
+    shadowRadius: 3,
+    elevation: 2,
   },
   avatarText: {
     color: '#fff',
@@ -340,32 +383,34 @@ const styles = StyleSheet.create({
   },
   postContent: {
     paddingHorizontal: 16,
-    paddingVertical: 4,
+    paddingVertical: 8,
   },
   postTitle: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '600',
-    color: '#262626',
-    lineHeight: 22,
-    marginBottom: 8,
-    letterSpacing: -0.2,
+    color: '#1a1a1a',
+    lineHeight: 24,
+    marginBottom: 10,
+    letterSpacing: -0.3,
   },
   postBody: {
-    fontSize: 14,
-    color: '#8e8e8e',
-    lineHeight: 20,
-    marginTop: 4,
+    fontSize: 15,
+    color: '#666',
+    lineHeight: 22,
+    marginTop: 2,
   },
   postFooter: {
     paddingHorizontal: 16,
-    paddingTop: 8,
+    paddingTop: 12,
   },
   viewPostButton: {
     flexDirection: 'row',
     alignItems: 'center',
     alignSelf: 'flex-start',
-    paddingVertical: 6,
-    paddingHorizontal: 12,
+    paddingVertical: 8,
+    paddingHorizontal: 16,
+    backgroundColor: '#f0f7ff',
+    borderRadius: 20,
   },
   viewPostText: {
     fontSize: 14,
@@ -379,12 +424,26 @@ const styles = StyleSheet.create({
     fontWeight: '600',
   },
   emptyContainer: {
-    padding: 40,
+    padding: 60,
     alignItems: 'center',
+    justifyContent: 'center',
+  },
+  emptyIcon: {
+    fontSize: 64,
+    marginBottom: 16,
+    opacity: 0.5,
   },
   emptyText: {
-    fontSize: 15,
-    color: '#8e8e8e',
+    fontSize: 16,
+    color: '#666',
+    fontWeight: '500',
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  emptySubtext: {
+    fontSize: 14,
+    color: '#999',
     fontWeight: '400',
+    textAlign: 'center',
   },
 });

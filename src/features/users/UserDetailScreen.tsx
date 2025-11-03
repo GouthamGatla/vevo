@@ -7,25 +7,25 @@ import {
   Text,
   TouchableOpacity,
   Animated,
+  RefreshControl,
+  Linking,
 } from 'react-native';
 import { useGetUserByIdQuery } from '../../services/api/usersApi';
 import { useRoute, RouteProp } from '@react-navigation/native';
-import { RootStackParamList } from '../../navigation/AppRoutes';
 import NotificationIcon from '../../../assets/icons/notification.svg';
 import MobileIcon from '../../../assets/icons/mobileIcon.svg';
 import WebIcon from '../../../assets/icons/web.svg';
 import LocationIcon from '../../../assets/icons/location.svg';
 import CommunityIcon from '../../../assets/icons/community.svg';
 
-type UserDetailScreenRouteProp = RouteProp<RootStackParamList, 'UserDetailScreen'>;
 
 export const UserDetailScreen: React.FC = () => {
-  const route = useRoute<UserDetailScreenRouteProp>();
+  const route = useRoute<any>();
   const { userId } = route.params;
 
   const fadeAnim = useRef(new Animated.Value(0)).current;
 
-  const { data: user, isLoading, error } = useGetUserByIdQuery(userId);
+  const { data: user, isLoading, error, refetch } = useGetUserByIdQuery(userId);
 
   useEffect(() => {
     if (user) {
@@ -46,13 +46,37 @@ export const UserDetailScreen: React.FC = () => {
     return name.substring(0, 2).toUpperCase();
   }, []);
 
-  const getUserColor = useCallback((userId: number) => {
+  const getUserColor = useCallback((id: number) => {
     const colors = [
       '#0077b5', '#006699', '#004d73', '#003d5c',
       '#0a66c2', '#0e5490', '#0576b8', '#0768b3'
     ];
-    return colors[userId % colors.length];
+    return colors[id % colors.length];
   }, []);
+
+  const handleEmailPress = useCallback(() => {
+    if (user?.email) {
+      Linking.openURL(`mailto:${user.email}`);
+    }
+  }, [user?.email]);
+
+  const handlePhonePress = useCallback(() => {
+    if (user?.phone) {
+      const phoneNumber = user.phone.replace(/\s/g, '');
+      Linking.openURL(`tel:${phoneNumber}`);
+    }
+  }, [user?.phone]);
+
+  const handleWebsitePress = useCallback(() => {
+    if (user?.website) {
+      const url = user.website.startsWith('http') ? user.website : `https://${user.website}`;
+      Linking.openURL(url);
+    }
+  }, [user?.website]);
+
+  const onRefresh = useCallback(() => {
+    refetch();
+  }, [refetch]);
 
   if (isLoading) {
     return (
@@ -82,6 +106,14 @@ export const UserDetailScreen: React.FC = () => {
       style={styles.container} 
       showsVerticalScrollIndicator={false}
       contentContainerStyle={styles.scrollContent}
+      refreshControl={
+        <RefreshControl
+          refreshing={isLoading}
+          onRefresh={onRefresh}
+          tintColor="#0077b5"
+          colors={['#0077b5']}
+        />
+      }
     >
       <Animated.View style={{ opacity: fadeAnim }}>
         <View style={styles.profileCard}>
@@ -98,29 +130,41 @@ export const UserDetailScreen: React.FC = () => {
           <Text style={styles.sectionTitle}>Contact</Text>
           <View style={styles.divider} />
           
-          <View style={styles.contactItem}>
+          <TouchableOpacity 
+            style={styles.contactItem}
+            onPress={handleEmailPress}
+            activeOpacity={0.7}
+          >
             <NotificationIcon width={24} height={24} />
             <View style={styles.contactInfo}>
               <Text style={styles.contactLabel}>Email</Text>
               <Text style={styles.contactValue}>{user.email}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
-          <View style={styles.contactItem}>
-          <MobileIcon width={24} height={24} />
+          <TouchableOpacity 
+            style={styles.contactItem}
+            onPress={handlePhonePress}
+            activeOpacity={0.7}
+          >
+            <MobileIcon width={24} height={24} />
             <View style={styles.contactInfo}>
               <Text style={styles.contactLabel}>Phone</Text>
               <Text style={styles.contactValue}>{user.phone}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
-          <View style={styles.contactItem}>
-          <WebIcon width={24} height={24} />
+          <TouchableOpacity 
+            style={styles.contactItem}
+            onPress={handleWebsitePress}
+            activeOpacity={0.7}
+          >
+            <WebIcon width={24} height={24} />
             <View style={styles.contactInfo}>
               <Text style={styles.contactLabel}>Website</Text>
               <Text style={styles.contactLink}>{user.website}</Text>
             </View>
-          </View>
+          </TouchableOpacity>
         </View>
 
         <View style={styles.sectionCard}>
@@ -224,19 +268,19 @@ const styles = StyleSheet.create({
     paddingHorizontal: 16,
   },
   profilePicture: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
+    width: 128,
+    height: 128,
+    borderRadius: 64,
     justifyContent: 'center',
     alignItems: 'center',
-    marginBottom: 16,
-    borderWidth: 4,
+    marginBottom: 20,
+    borderWidth: 5,
     borderColor: '#ffffff',
     shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 3,
+    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.15,
+    shadowRadius: 6,
+    elevation: 5,
   },
   profilePictureText: {
     color: '#fff',
@@ -245,17 +289,17 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   profileName: {
-    fontSize: 24,
-    fontWeight: '600',
-    color: '#000000',
-    marginBottom: 4,
+    fontSize: 26,
+    fontWeight: '700',
+    color: '#1a1a1a',
+    marginBottom: 6,
     textAlign: 'center',
     letterSpacing: -0.5,
   },
   profileUsername: {
-    fontSize: 16,
+    fontSize: 17,
     fontWeight: '400',
-    color: '#666666',
+    color: '#666',
     textAlign: 'center',
   },
   sectionCard: {
@@ -285,8 +329,8 @@ const styles = StyleSheet.create({
   contactItem: {
     flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    padding: 16,
+    paddingHorizontal: 16,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#f3f2ef',
   },
@@ -297,6 +341,7 @@ const styles = StyleSheet.create({
   },
   contactInfo: {
     flex: 1,
+    marginLeft: 12,
   },
   contactLabel: {
     fontSize: 13,
@@ -320,7 +365,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'flex-start',
     paddingHorizontal: 16,
-    paddingVertical: 12,
+    paddingVertical: 16,
     borderBottomWidth: 1,
     borderBottomColor: '#f3f2ef',
   },
@@ -331,6 +376,7 @@ const styles = StyleSheet.create({
   },
   locationInfo: {
     flex: 1,
+    marginLeft: 12,
   },
   locationAddress: {
     fontSize: 15,

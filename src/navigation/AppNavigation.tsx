@@ -1,4 +1,4 @@
-import { NavigationContainer, RouteProp } from "@react-navigation/native";
+import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
