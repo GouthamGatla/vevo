@@ -13,15 +13,12 @@ import { useGetPostsQuery } from '../../services/api/postsApi';
 import { useGetUsersQuery } from '../../services/api/usersApi';
 import { Post } from '../../services/api/postsApi';
 import { useNavigation } from '@react-navigation/native';
-import { StackNavigationProp } from '@react-navigation/stack';
-import { RootStackParamList } from '../../navigation/AppRoutes';
 import { useDebounce } from 'use-debounce';
 import SearchIcon from '../../../assets/icons/search.svg';
 
-type PostsListScreenNavigationProp = StackNavigationProp<RootStackParamList, 'PostsListScreen'>;
 
 export const PostsListScreen: React.FC = () => {
-  const navigation = useNavigation<PostsListScreenNavigationProp>();
+  const navigation = useNavigation<any>();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
   
@@ -165,11 +162,10 @@ export const PostsListScreen: React.FC = () => {
 
       <View style={styles.searchContainer}>
         <View style={styles.searchInputContainer}>
-          {/* <Text style={styles.searchIcon}>🔍</Text> */}
           <SearchIcon width={24} height={24} />
           <TextInput
             style={styles.searchInput}
-            placeholder="Search posts..."
+            placeholder="Search"
             placeholderTextColor="#999"
             value={searchQuery}
             onChangeText={setSearchQuery}

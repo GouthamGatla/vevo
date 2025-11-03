@@ -2,16 +2,16 @@ import { NavigationContainer, RouteProp } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
 import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AppRoutes, RootStackParamList } from "./AppRoutes";
+import { AppRoutes} from "./AppRoutes";
 import { PostsListScreen } from "../features/posts/PostsListScreen";
 import { PostDetailScreen } from "../features/posts/PostDetailScreen";
 import { UserDetailScreen } from "../features/users/UserDetailScreen";
 import { CustomHeader } from "../components/CustomHeader/CustomHeader";
 
-const Stack = createStackNavigator<RootStackParamList>();
+const Stack = createStackNavigator();
 
 const AppNavigation = () => {
-    const createScreenOptions = ({ route }: { route: RouteProp<RootStackParamList, keyof RootStackParamList> }) => {
+    const createScreenOptions = ({ route }: { route: any }) => {
         const getScreenTitle = () => {
             switch (route.name) {
                 case 'PostsListScreen':

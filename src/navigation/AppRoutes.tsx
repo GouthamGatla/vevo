@@ -4,8 +4,3 @@ export const AppRoutes = {
   userDetail: 'UserDetailScreen',
 } as const;
 
-export type RootStackParamList = {
-  PostsListScreen: undefined;
-  PostDetailScreen: { postId: number };
-  UserDetailScreen: { userId: number };
-};
