@@ -1,8 +1,8 @@
 import { NavigationContainer } from "@react-navigation/native";
 import { createStackNavigator } from "@react-navigation/stack";
-import { Platform, StyleSheet } from "react-native";
+import { StyleSheet } from "react-native";
 import { SafeAreaView } from "react-native-safe-area-context";
-import { AppRoutes } from "./AppRoutes";
+import { AppRoutes} from "./AppRoutes";
 import { PostsListScreen } from "../features/posts/PostsListScreen";
 import { PostDetailScreen } from "../features/posts/PostDetailScreen";
 import { UserDetailScreen } from "../features/users/UserDetailScreen";
@@ -30,8 +30,8 @@ const AppNavigation = () => {
 
         return {
             header: hideHeader ? () => null : () => (
-                <CustomHeader
-                    title={getScreenTitle()}
+                <CustomHeader 
+                    title={getScreenTitle()} 
                     showBackButton={showBackButton}
                 />
             ),
@@ -42,21 +42,21 @@ const AppNavigation = () => {
     return (
         <SafeAreaView style={styles.container}>
             <NavigationContainer>
-                <Stack.Navigator
+                <Stack.Navigator 
                     initialRouteName={AppRoutes.posts}
                     screenOptions={({ route }) => createScreenOptions({ route })}
                 >
-                    <Stack.Screen
-                        name={AppRoutes.posts}
-                        component={PostsListScreen}
+                    <Stack.Screen 
+                        name={AppRoutes.posts} 
+                        component={PostsListScreen} 
                     />
-                    <Stack.Screen
-                        name={AppRoutes.postDetail}
-                        component={PostDetailScreen}
+                    <Stack.Screen 
+                        name={AppRoutes.postDetail} 
+                        component={PostDetailScreen} 
                     />
-                    <Stack.Screen
-                        name={AppRoutes.userDetail}
-                        component={UserDetailScreen}
+                    <Stack.Screen 
+                        name={AppRoutes.userDetail} 
+                        component={UserDetailScreen} 
                     />
                 </Stack.Navigator>
             </NavigationContainer>

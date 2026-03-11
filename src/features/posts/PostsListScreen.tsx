@@ -1,15 +1,14 @@
-import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import {
-  View,
-  StyleSheet,
-  ActivityIndicator,
-  TouchableOpacity,
-  FlatList,
+import React, { useState, useMemo, useCallback } from 'react';
+import { 
+  View, 
+  StyleSheet, 
+  ActivityIndicator, 
+  TouchableOpacity, 
+  FlatList, 
   Text,
   TextInput,
   Platform,
   RefreshControl,
-  Alert
 } from 'react-native';
 import { useGetPostsQuery } from '../../services/api/postsApi';
 import { useGetUsersQuery } from '../../services/api/usersApi';
@@ -17,94 +16,15 @@ import { Post } from '../../services/api/postsApi';
 import { useNavigation } from '@react-navigation/native';
 import { useDebounce } from 'use-debounce';
 import SearchIcon from '../../../assets/icons/search.svg';
-import { request, RESULTS } from 'react-native-permissions';
-import messaging from '@react-native-firebase/messaging';
-// import notifee from '@notifee/react-native';
 
 
 export const PostsListScreen: React.FC = () => {
   const navigation = useNavigation<any>();
   const [searchQuery, setSearchQuery] = useState('');
   const [debouncedSearchQuery] = useDebounce(searchQuery, 300);
-
+  
   const { data: posts, isLoading: isLoadingPosts, error: postsError, refetch: refetchPosts } = useGetPostsQuery();
   const { data: users, isLoading: isLoadingUsers, refetch: refetchUsers } = useGetUsersQuery();
-
-  const requestNotificationPermission = async () => {
-    try {
-      let permission = 'android.permission.POST_NOTIFICATIONS' as any;
-
-      // if (Platform.OS === 'android') {
-      //   permission = PERMISSIONS.ANDROID.POST_NOTIFICATIONS;
-      // } else {
-      //   permission = PERMISSIONS.IOS.NOTIFICATIONS;
-      // }
-
-      const result = await request(permission);
-
-      switch (result) {
-        case RESULTS.GRANTED:
-          console.log("Notification permission granted");
-          break;
-
-        case RESULTS.DENIED:
-          console.log("Notification permission denied");
-          break;
-
-        case RESULTS.BLOCKED:
-          console.log("Notification permission blocked");
-          break;
-
-        default:
-          console.log("Permission status:", result);
-      }
-    } catch (error) {
-      console.log("Permission error:", error);
-    }
-  };
-
-  useEffect(() => {
-    requestNotificationPermission();
-    messaging()
-      .getToken()
-      .then(token => {
-        console.log(token, "TOKEN");
-      });
-  }, []);
-
-  useEffect(() => {
-    const unsubscribe = messaging().onMessage(async remoteMessage => {
-      Alert.alert('A new FCM message arrived!', JSON.stringify(remoteMessage));
-      // onDisplayNotification(remoteMessage)
-    });
-
-    return unsubscribe;
-  }, []);
-
-  //  const onDisplayNotification = async (remoteMessage) => {
-  //   // Request permissions (required for iOS)
-  //   await notifee.requestPermission()
-
-  //   // Create a channel (required for Android)
-  //   const channelId = await notifee.createChannel({
-  //     id: 'default',
-  //     name: 'Default Channel',
-  //   });
-
-  //   // Display a notification
-  //   await notifee.displayNotification({
-  //     title: remoteMessage.notification.title,
-  //     body: 'Main body content of the notification',
-  //     android: {
-  //       channelId,
-  //       smallIcon: 'name-of-a-small-icon', // optional, defaults to 'ic_launcher'.
-  //       // pressAction is needed if you want the notification to open the app when pressed
-  //       pressAction: {
-  //         id: 'default',
-  //       },
-  //     },
-  //   });
-  // }
 
   const userIdToName = useMemo(() => {
     if (!users) return {};
@@ -154,7 +74,7 @@ export const PostsListScreen: React.FC = () => {
 
   const getUserColor = useCallback((userId: number) => {
     const colors = [
-      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A',
+      '#FF6B6B', '#4ECDC4', '#45B7D1', '#FFA07A', 
       '#98D8C8', '#F7DC6F', '#BB8FCE', '#85C1E2'
     ];
     return colors[userId % colors.length];
@@ -165,11 +85,11 @@ export const PostsListScreen: React.FC = () => {
     const username = userIdToUsername[post.userId] || '';
     const userColor = getUserColor(post.userId);
     const userInitials = getUserInitials(userName);
-
+    
     return (
       <View style={styles.postCard}>
         <View style={styles.postHeader}>
-          <TouchableOpacity
+          <TouchableOpacity 
             onPress={() => handleUsernamePress(post.userId)}
             style={styles.userInfo}
             activeOpacity={0.7}
@@ -188,7 +108,7 @@ export const PostsListScreen: React.FC = () => {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
+        <TouchableOpacity 
           onPress={() => handlePostPress(post.id)}
           activeOpacity={0.95}
           style={styles.postContent}
@@ -204,7 +124,7 @@ export const PostsListScreen: React.FC = () => {
         </TouchableOpacity>
 
         <View style={styles.postFooter}>
-          <TouchableOpacity
+          <TouchableOpacity 
             onPress={() => handlePostPress(post.id)}
             style={styles.viewPostButton}
             activeOpacity={0.7}
@@ -263,7 +183,7 @@ export const PostsListScreen: React.FC = () => {
             autoCorrect={false}
           />
           {searchQuery.length > 0 && (
-            <TouchableOpacity
+            <TouchableOpacity 
               onPress={() => setSearchQuery('')}
               style={styles.clearButton}
               hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
