@@ -17,7 +17,8 @@ import { Post } from '../../services/api/postsApi';
 import { useNavigation } from '@react-navigation/native';
 import { useDebounce } from 'use-debounce';
 import SearchIcon from '../../../assets/icons/search.svg';
-import {requestNotifications} from 'react-native-permissions';
+import {requestNotifications, check} from 'react-native-permissions';
+import messaging from '@react-native-firebase/messaging';
 
 
 
@@ -39,8 +40,15 @@ export const PostsListScreen: React.FC = () => {
   }
 };
 
+const getToken = () => {
+  const token = messaging().getToken();
+  console.log(token, "token");
+}
+
 useEffect(() => {
   requestNotificationPermission();
+  getToken();
+
 },[])
 
   const userIdToName = useMemo(() => {
