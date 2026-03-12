@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect } from 'react';
 import { 
   View, 
   StyleSheet, 
@@ -9,6 +9,7 @@ import {
   TextInput,
   Platform,
   RefreshControl,
+  PermissionsAndroid,
 } from 'react-native';
 import { useGetPostsQuery } from '../../services/api/postsApi';
 import { useGetUsersQuery } from '../../services/api/usersApi';
@@ -16,6 +17,8 @@ import { Post } from '../../services/api/postsApi';
 import { useNavigation } from '@react-navigation/native';
 import { useDebounce } from 'use-debounce';
 import SearchIcon from '../../../assets/icons/search.svg';
+import {requestNotifications} from 'react-native-permissions';
+
 
 
 export const PostsListScreen: React.FC = () => {
@@ -25,6 +28,20 @@ export const PostsListScreen: React.FC = () => {
   
   const { data: posts, isLoading: isLoadingPosts, error: postsError, refetch: refetchPosts } = useGetPostsQuery();
   const { data: users, isLoading: isLoadingUsers, refetch: refetchUsers } = useGetUsersQuery();
+
+  const requestNotificationPermission = async () => {
+  if (Platform.OS === 'ios') {
+    await requestNotifications(['alert', 'sound', 'badge']);
+  } else if (Platform.OS === 'android' && Platform.Version >= 33) {
+    await PermissionsAndroid.request(
+      PermissionsAndroid.PERMISSIONS.POST_NOTIFICATIONS
+    );
+  }
+};
+
+useEffect(() => {
+  requestNotificationPermission();
+},[])
 
   const userIdToName = useMemo(() => {
     if (!users) return {};
