@@ -1,4 +1,4 @@
-package com.vaave_forum_application
+package com.vaaveforumapplication.co
 
 import com.facebook.react.ReactActivity
 import com.facebook.react.ReactActivityDelegate

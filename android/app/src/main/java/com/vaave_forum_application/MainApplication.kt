@@ -1,4 +1,4 @@
-package com.vaave_forum_application
+package com.vaaveforumapplication.co
 
 import android.app.Application
 import com.facebook.react.PackageList

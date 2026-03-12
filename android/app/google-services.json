@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "81046121815",
+    "project_id": "vavee-1eb0f",
+    "storage_bucket": "vavee-1eb0f.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:81046121815:android:d1e7c310a750c9c9106212",
+        "android_client_info": {
+          "package_name": "com.vaaveforumapplication.co"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC6w4N5Mv0p-kqCSBtOQJvTRFN_CTWQSqI"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
